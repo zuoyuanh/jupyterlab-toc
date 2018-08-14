@@ -16,7 +16,7 @@ import { each } from '@phosphor/algorithm';
 import { TableOfContentsRegistry } from './registry';
 
 import { IHeading, TableOfContents } from './toc';
-import { CodeComponent, ExperimentalCodeComponent } from './codemirror';
+import { ExperimentalCodeComponent } from './codemirror';
 
 import {
   createDropdownMenu
@@ -93,16 +93,6 @@ class NotebookGeneratorOptionsManager extends TableOfContentsRegistry.IGenerator
     return this._showCode;
   }
 
-  set showRaw(value: boolean) {
-    this._showRaw = value;
-    this._widget.notebookMetadata = ['toc-showraw', this._showRaw];
-    this._widget.update();
-  }
-
-  get showRaw() {
-    return this._showRaw;
-  }
-
   set showMarkdown(value: boolean) {
     this._showMarkdown = value;
     this._widget.notebookMetadata = ['toc-showmarkdowntxt', this._showMarkdown];
@@ -113,6 +103,16 @@ class NotebookGeneratorOptionsManager extends TableOfContentsRegistry.IGenerator
     return this._showMarkdown;
   }
 
+  set showTags(value: boolean) {
+    this._showTags = value;
+    this._widget.notebookMetadata = ['toc-showtags', this._showTags];
+    this._widget.update();
+  }
+
+  get showTags() {
+    return this._showTags;
+  }
+
   updateWidget() {
     this._widget.update();
   }
@@ -121,21 +121,21 @@ class NotebookGeneratorOptionsManager extends TableOfContentsRegistry.IGenerator
   initializeOptions(
     numbering: boolean,
     showCode: boolean,
-    showRaw: boolean,
-    showMarkdown: boolean
+    showMarkdown: boolean,
+    showTags: boolean
   ) {
     this._numbering = numbering;
     this._showCode = showCode;
-    this._showRaw = showRaw;
     this._showMarkdown = showMarkdown;
+    this._showTags = showTags;
     this._widget.update();
   }
 
   sanitizer: ISanitizer;
   private _numbering: boolean;
   private _showCode = false;
-  private _showRaw = false;
   private _showMarkdown = false;
+  private _showTags = false;
   private _notebook: INotebookTracker;
   private _widget: TableOfContents;
 }
@@ -304,8 +304,8 @@ interface NotebookGeneratorToolbarProps {}
 
 interface NotebookGeneratorToolbarState {
   showCode: boolean;
-  showRaw: boolean;
   showMarkdown: boolean;
+  showTags: boolean;
 }
 
 export function notebookGeneratorToolbar(
@@ -318,7 +318,7 @@ export function notebookGeneratorToolbar(
   > {
     constructor(props: NotebookGeneratorToolbarProps) {
       super(props);
-      this.state = { showCode: true, showRaw: false, showMarkdown: false };
+      this.state = { showCode: true, showMarkdown: false, showTags: false };
       if (tracker.currentWidget) {
         tracker.currentWidget.context.ready.then(() => {
           if (tracker.currentWidget) {
@@ -335,38 +335,36 @@ export function notebookGeneratorToolbar(
             ) as boolean;
             let showCode =
               _showCode != undefined ? _showCode : options.showCode;
-            let _showRaw = tracker.currentWidget.model.metadata.get(
-              'toc-showraw'
-            ) as boolean;
-            let showRaw = _showRaw != undefined ? _showRaw : options.showRaw;
             let _showMarkdown = tracker.currentWidget.model.metadata.get(
               'toc-showmarkdowntxt'
             ) as boolean;
             let showMarkdown =
               _showMarkdown != undefined ? _showMarkdown : options.showMarkdown;
+            let _showTags = tracker.currentWidget.model.metadata.get(
+              'toc-showtags'
+            ) as boolean;
+            let showTags =
+              _showTags != undefined ? _showTags : options.showTags;
+            this.allTags = null;
             options.initializeOptions(
               numbering,
               showCode,
-              showRaw,
-              showMarkdown
+              showMarkdown,
+              showTags
             );
             this.setState({
               showCode: options.showCode,
-              showRaw: options.showRaw,
-              showMarkdown: options.showMarkdown
+              showMarkdown: options.showMarkdown,
+              showTags: options.showTags
             });
           }
         });
       }
     }
+    public allTags: string[] | null;
     toggleCode = (component: React.Component) => {
       options.showCode = !options.showCode;
       this.setState({ showCode: options.showCode });
-    };
-
-    toggleRaw = (component: React.Component) => {
-      options.showRaw = !options.showRaw;
-      this.setState({ showRaw: options.showRaw });
     };
 
     toggleMarkdown = (component: React.Component) => {
@@ -376,6 +374,41 @@ export function notebookGeneratorToolbar(
 
     toggleAutoNumbering = () => {
       options.numbering = !options.numbering;
+    };
+
+    toggleTagDropdown = () => {
+      options.showTags = !options.showTags;
+      this.setState({ showTags: options.showTags });
+    };
+
+    addTagIntoAllTagsList(name: string) {
+      if (name === '') {
+        return;
+      } else if (this.allTags == null) {
+        this.allTags = [name];
+      } else {
+        if (this.allTags.indexOf(name) < 0) {
+          this.allTags.push(name);
+        }
+      }
+    }
+
+    getTags = () => {
+      let notebook = tracker.currentWidget;
+      if (notebook) {
+        let cells = notebook.model.cells;
+        this.allTags = null;
+        for (var i = 0; i < cells.length; i++) {
+          let cellMetadata = cells.get(i).metadata;
+          let cellTagsData = cellMetadata.get('tags') as string[];
+          if (cellTagsData) {
+            for (var j = 0; j < cellTagsData.length; j++) {
+              let name = cellTagsData[j];
+              this.addTagIntoAllTagsList(name);
+            }
+          }
+        }
+      }
     };
 
     renderedDropdownMenu: any = createDropdownMenu();
@@ -438,47 +471,60 @@ export function notebookGeneratorToolbar(
         </div>
       );
 
+      let tagDropdown = <div />;
+      let tagIcon = (
+        <img
+          alt="Show Tag Dropdown"
+          title="Show Tag Dropdown"
+          src={require('../static/tag_unselected.svg')}
+        />
+      );
+      if (this.state.showTags) {
+        this.getTags();
+        tagDropdown = <div className={'tag-dropdown'}> {this.allTags} </div>;
+        tagIcon = (
+          <img
+            alt="Hide Tag Dropdown"
+            title="Hide Tag Dropdown"
+            src={require('../static/tag_selected.svg')}
+          />
+        );
+      }
+
       return (
-        <div className="toc-toolbar">
-          {/* <DropdownMenu
-            className="celltypes-dropdown"
-            items={{
-              stateIndicator: '',
-              items: dropDownMenuItems
-            }}
-            buttonTitle={
-              <span>
-                Cell Type
-                <img
-                  className="dropdown-arrow"
-                  src={require('../static/menu_arrow.svg')}
-                />
-              </span>
-            }
-          /> */}
-          {codeIcon}
-          <div
-            className="auto-numbering-button"
-            onClick={event => this.toggleMarkdown.bind(this)}
-          >
-            <img
-              alt="Toggle Code Cells"
-              title="Toggle Code Cells"
-              src={require('../static/markdown_unselected.svg')}
-              className="numberingIcon"
-            />
+        <div>
+          <div className={'toc-toolbar'}>
+            {codeIcon}
+            <div
+              className={'auto-numbering-button'}
+              onClick={event => this.toggleMarkdown.bind(this)}
+            >
+              <img
+                alt="Toggle Code Cells"
+                title="Toggle Code Cells"
+                src={require('../static/markdown_unselected.svg')}
+                className="numberingIcon"
+              />
+            </div>
+            <div
+              className="auto-numbering-button"
+              onClick={event => this.toggleAutoNumbering()}
+            >
+              <img
+                alt="Toggle Auto-Numbering"
+                title="Toggle Auto-Numbering"
+                src={require('../static/numbering.svg')}
+                className="numberingIcon"
+              />
+            </div>
+            <div
+              className={'tag-dropdown-button'}
+              onClick={event => this.toggleTagDropdown()}
+            >
+              {tagIcon}
+            </div>
           </div>
-          <div
-            className="auto-numbering-button"
-            onClick={event => this.toggleAutoNumbering()}
-          >
-            <img
-              alt="Toggle Auto-Numbering"
-              title="Toggle Auto-Numbering"
-              src={require('../static/numbering.svg')}
-              className="numberingIcon"
-            />
-          </div>
+          {tagDropdown}
         </div>
       );
     }
@@ -708,38 +754,8 @@ export function createNotebookGenerator(
               }
             }
           }
-        } else if (model.type === 'raw') {
-          let showRaw = false;
-          if (widget) {
-            showRaw = options.showRaw;
-          }
-          if (showRaw) {
-            let text = (model as CodeCellModel).value.text;
-            const onClickFactory2 = (line: number) => {
-              return () => {
-                cell.node.scrollIntoView();
-              };
-            };
-            let lastLevel = Private.getLastLevel(headings);
-            let renderedHeadings = Private.getRawCells(
-              text,
-              onClickFactory2,
-              numberingDict,
-              lastLevel,
-              cell
-            );
-            if (currentCollapseLevel < 0) {
-              headings = headings.concat(renderedHeadings);
-            }
-            prevHeading = renderedHeadings[0];
-          }
         }
       });
-      // for (let i = 0; i < headings.length - 1; i++) {
-      //   if (headings[i + 1].level < headings[i].level) {
-      //     console.log('has a child!');
-      //   }
-      // }
       return headings;
     }
   };
