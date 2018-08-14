@@ -322,7 +322,7 @@ export function notebookGeneratorToolbar(
       this.state = {
         showCode: true,
         showMarkdown: false,
-  showTags: false,
+        showTags: false,
         numbering: true
       };
       if (tracker.currentWidget) {
@@ -551,18 +551,17 @@ export function notebookGeneratorToolbar(
       }
 
       return (
-  <div>
-        <div className="toc-toolbar">
-          {codeIcon}
-          {markdownIcon}
-          {numberingIcon}
-</div>
-<div
-              className={'tag-dropdown-button'}
-              onClick={event => this.toggleTagDropdown()}
-            >
-              {tagIcon}
-            </div>
+        <div>
+          <div className={'toc-toolbar'}>
+            {codeIcon}
+            {markdownIcon}
+            {numberingIcon}
+          </div>
+          <div
+            className={'tag-dropdown-button'}
+            onClick={event => this.toggleTagDropdown()}
+          >
+            {tagIcon}
           </div>
           {tagDropdown}
         </div>
