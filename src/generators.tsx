@@ -306,6 +306,7 @@ interface NotebookGeneratorToolbarState {
   showCode: boolean;
   showMarkdown: boolean;
   showTags: boolean;
+  numbering: boolean;
 }
 
 export function notebookGeneratorToolbar(
@@ -318,7 +319,12 @@ export function notebookGeneratorToolbar(
   > {
     constructor(props: NotebookGeneratorToolbarProps) {
       super(props);
-      this.state = { showCode: true, showMarkdown: false, showTags: false };
+      this.state = {
+        showCode: true,
+        showMarkdown: false,
+  showTags: false,
+        numbering: true
+      };
       if (tracker.currentWidget) {
         tracker.currentWidget.context.ready.then(() => {
           if (tracker.currentWidget) {
@@ -374,6 +380,7 @@ export function notebookGeneratorToolbar(
 
     toggleAutoNumbering = () => {
       options.numbering = !options.numbering;
+      this.setState({ numbering: options.numbering });
     };
 
     toggleTagDropdown = () => {
@@ -447,26 +454,78 @@ export function notebookGeneratorToolbar(
 
       let codeIcon = this.state.showCode ? (
         <div
-          className="auto-numbering-button"
-          onClick={event => this.toggleCode.bind(this)}
+          className="toc-toolbar-code-button toc-toolbar-button"
+          onClick={event => this.toggleCode.bind(this)()}
         >
           <img
             alt="Toggle Code Cells"
             title="Toggle Code Cells"
             src={require('../static/code_selected.svg')}
-            className="numberingIcon"
+            className="toc-toolbar-code-icon toc-toolbar-icon"
           />
         </div>
       ) : (
         <div
-          className="auto-numbering-button"
-          onClick={event => this.toggleCode.bind(this)}
+          className="toc-toolbar-code-button toc-toolbar-button"
+          onClick={event => this.toggleCode.bind(this)()}
         >
           <img
             alt="Toggle Code Cells"
             title="Toggle Code Cells"
             src={require('../static/code_unselected.svg')}
-            className="numberingIcon"
+            className="toc-toolbar-code-icon toc-toolbar-icon"
+          />
+        </div>
+      );
+
+      let markdownIcon = this.state.showMarkdown ? (
+        <div
+          className="toc-toolbar-markdown-button toc-toolbar-button"
+          onClick={event => this.toggleMarkdown.bind(this)()}
+        >
+          <img
+            alt="Toggle Code Cells"
+            title="Toggle Code Cells"
+            src={require('../static/markdown_selected.svg')}
+            className="toc-toolbar-markdown-icon toc-toolbar-icon"
+          />
+        </div>
+      ) : (
+        <div
+          className="toc-toolbar-markdown-button toc-toolbar-button"
+          onClick={event => this.toggleMarkdown.bind(this)()}
+        >
+          <img
+            alt="Toggle Code Cells"
+            title="Toggle Code Cells"
+            src={require('../static/markdown_unselected.svg')}
+            className="toc-toolbar-markdown-icon toc-toolbar-icon"
+          />
+        </div>
+      );
+
+      let numberingIcon = this.state.numbering ? (
+        <div
+          className="toc-toolbar-auto-numbering-button toc-toolbar-button"
+          onClick={event => this.toggleAutoNumbering()}
+        >
+          <img
+            alt="Toggle Auto-Numbering"
+            title="Toggle Auto-Numbering"
+            src={require('../static/autonumbering_selected.svg')}
+            className="toc-toolbar-auto-numbering-icon toc-toolbar-icon"
+          />
+        </div>
+      ) : (
+        <div
+          className="toc-toolbar-auto-numbering-button toc-toolbar-button"
+          onClick={event => this.toggleAutoNumbering()}
+        >
+          <img
+            alt="Toggle Auto-Numbering"
+            title="Toggle Auto-Numbering"
+            src={require('../static/autonumbering_unselected.svg')}
+            className="toc-toolbar-auto-numbering-icon toc-toolbar-icon"
           />
         </div>
       );
@@ -492,32 +551,13 @@ export function notebookGeneratorToolbar(
       }
 
       return (
-        <div>
-          <div className={'toc-toolbar'}>
-            {codeIcon}
-            <div
-              className={'auto-numbering-button'}
-              onClick={event => this.toggleMarkdown.bind(this)}
-            >
-              <img
-                alt="Toggle Code Cells"
-                title="Toggle Code Cells"
-                src={require('../static/markdown_unselected.svg')}
-                className="numberingIcon"
-              />
-            </div>
-            <div
-              className="auto-numbering-button"
-              onClick={event => this.toggleAutoNumbering()}
-            >
-              <img
-                alt="Toggle Auto-Numbering"
-                title="Toggle Auto-Numbering"
-                src={require('../static/numbering.svg')}
-                className="numberingIcon"
-              />
-            </div>
-            <div
+  <div>
+        <div className="toc-toolbar">
+          {codeIcon}
+          {markdownIcon}
+          {numberingIcon}
+</div>
+<div
               className={'tag-dropdown-button'}
               onClick={event => this.toggleTagDropdown()}
             >
@@ -544,7 +584,7 @@ export function createNotebookGenerator(
   widget: TableOfContents
 ): TableOfContentsRegistry.IGenerator<NotebookPanel> {
   const options = new NotebookGeneratorOptionsManager(widget, tracker, {
-    needNumbering: false,
+    needNumbering: true,
     sanitizer: sanitizer
   });
   return {
