@@ -4,8 +4,6 @@ import { INotebookTracker } from '@jupyterlab/notebook';
 
 import { Widget } from '@phosphor/widgets';
 
-import { write_tag, preprocess_input, cleanup_metadata } from './celltags';
-
 import { TagsToolComponent } from './tagstool';
 
 import * as React from 'react';
@@ -14,7 +12,6 @@ import * as ReactDOM from 'react-dom';
 export class TagsWidget extends Widget {
   constructor(notebook_Tracker: INotebookTracker) {
     super();
-    this.notebookTracker = notebook_Tracker;
     Private.setWidget(this);
     Private.renderAllTagsNode();
   }
@@ -36,10 +33,6 @@ export class TagsWidget extends Widget {
       return false;
     }
     return this.cellModelContainsTag(tag, cell.model);
-  }
-
-  activeCellContainsTag(tag: string) {
-    return this.containsTag(tag, this.currentActiveCell);
   }
 
   selectAll(names: string[]) {
@@ -91,24 +84,34 @@ export class TagsWidget extends Widget {
     this.renderAllTagLabels(this.allTagsInNotebook);
   }
 
-  loadTagsForActiveCell() {
-    if (this.currentActiveCell != null) {
-      let tags = this.currentActiveCell.model.metadata.get('tags');
-      Private.setTagsListFor(Private.TAGS_FOR_CELL, tags);
-    }
-  }
-
   renderAllTagLabels(tags: string[]) {
     Private.setTagsListFor(Private.ALL_TAGS, tags);
   }
 
   validateMetadataForActiveCell() {
-    cleanup_metadata(this.currentActiveCell);
+    let cell = this.currentActiveCell;
+    let taglist = cell.model.metadata.get('tags') as string[];
+    var results: string[] = [];
+    if (taglist === undefined) {
+      return;
+    }
+    for (let i = taglist.length - 1; i >= 0; i--) {
+      var found = false;
+      for (let j = 0; j < i; j++) {
+        if (taglist[j] === taglist[i]) {
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        results.push(taglist[i]);
+      }
+    }
+    cell.model.metadata.set('tags', results.reverse());
   }
-
-  currentActiveCell: Cell = null;
-  allTagsInNotebook: [string] = null;
-  notebookTracker: INotebookTracker = null;
+  currentActiveCell: Cell | null = null;
+  allTagsInNotebook: [string] | null = null;
+  notebookTracker: INotebookTracker | null = null;
   tagsListShallNotRefresh = false;
 }
 

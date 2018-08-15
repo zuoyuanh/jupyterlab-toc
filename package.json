@@ -17,7 +17,8 @@
   "files": [
     "lib/**/*.{d.ts,eot,gif,html,jpg,js,js.map,json,png,svg,woff2,ttf}",
     "style/**/*.{css,eot,gif,html,jpg,json,png,svg,woff2,ttf}",
-    "static/**/*.{css,eot,gif,html,jpg,json,png,svg,woff2,ttf}"
+    "static/**/*.{css,eot,gif,html,jpg,json,png,svg,woff2,ttf}",
+    "src/styles/**/*.{css,eot,gif,html,jpg,json,png,svg,woff2,ttf}"
   ],
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -40,7 +41,7 @@
     "@jupyterlab/docmanager": "^0.17.0",
     "@jupyterlab/docregistry": "^0.17.0",
     "@jupyterlab/fileeditor": "^0.17.0",
-    "@jupyterlab/notebook": "^0.17.0",
+    "@jupyterlab/notebook": "^0.17.2",
     "@jupyterlab/rendermime": "^0.17.0",
     "@phosphor/algorithm": "^1.1.2",
     "@phosphor/coreutils": "^1.3.0",

@@ -26,6 +26,8 @@ import {
 
 import * as React from 'react';
 
+import { TagsToolComponent } from './tagstool';
+
 const VDOM_MIME_TYPE = 'application/vdom.v1+json';
 
 const HTML_MIME_TYPE = 'text/html';
@@ -540,7 +542,12 @@ export function notebookGeneratorToolbar(
       );
       if (this.state.showTags) {
         this.getTags();
-        tagDropdown = <div className={'tag-dropdown'}> {this.allTags} </div>;
+        tagDropdown = (
+          <div className={'tag-dropdown'}>
+            {' '}
+            <TagsToolComponent />{' '}
+          </div>
+        );
         tagIcon = (
           <img
             alt="Hide Tag Dropdown"
