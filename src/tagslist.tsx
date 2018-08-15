@@ -1,24 +1,25 @@
 import { TagComponent } from './tag';
 
+import { TagsWidget } from './tagswidget';
+
 import * as React from 'react';
 import StyleClasses from './styles';
 
 const TagListStyleClasses = StyleClasses.TagListStyleClasses;
 
 export interface TagListComponentProps {
-  selectedTags: string[];
-  selectionStateHandler: (newState: string, add: boolean) => void;
+  widget: TagsWidget;
+  selectedTags: string[] | null;
+  selectionStateHandler: (newState: string) => void;
   allTagsList: string[] | null;
+  tagsList: string | null;
 }
 
 export interface TagListComponentState {
-  selected: string[];
+  selected: string[] | null;
 }
 
-export class TagListComponent extends React.Component<
-  TagListComponentProps,
-  TagListComponentState
-> {
+export class TagListComponent extends React.Component<any, any> {
   constructor(props: TagListComponentProps) {
     super(props);
     this.state = { selected: this.props.selectedTags };
@@ -49,7 +50,8 @@ export class TagListComponent extends React.Component<
           }}
           tabIndex={-1}
         >
-          <TagComponent
+          <TagType
+            widget={this.props.widget}
             selectionStateHandler={this.props.selectionStateHandler}
             selectedTags={this.props.selectedTags}
             tag={tag}
