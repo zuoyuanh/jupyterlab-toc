@@ -1,14 +1,11 @@
-import { TagsWidget } from './tagswidget';
-
 import * as React from 'react';
 import StyleClasses from './styles';
 
 const TagStyleClasses = StyleClasses.TagStyleClasses;
 
 export interface TagComponentProps {
-  widget: TagsWidget;
-  selectionStateHandler: (newState: string) => void;
-  selectedTags: string[] | null;
+  selectionStateHandler: (newState: string, add: boolean) => void;
+  selectedTags: string[];
   tag: string;
 }
 
@@ -24,7 +21,6 @@ export abstract class TagComponent extends React.Component<TagComponentProps> {
         <label
           className={TagStyleClasses.tagLabelStyleClass}
           key={new Date().toLocaleTimeString()}
-          //onFocus={event => document.execCommand('selectAll', false, null)}
         >
           {tag}
         </label>

@@ -1,6 +1,5 @@
 // Copyright (c) Jupyter Development Team.
 // Distributed under the terms of the Modified BSD License.
-
 import { IInstanceTracker, ISanitizer } from '@jupyterlab/apputils';
 
 import { CodeCell, CodeCellModel, MarkdownCell, Cell } from '@jupyterlab/cells';
@@ -25,6 +24,8 @@ import {
 } from './plugins';
 
 import * as React from 'react';
+
+import { TagsToolComponent } from './tagstool';
 
 const VDOM_MIME_TYPE = 'application/vdom.v1+json';
 
@@ -351,7 +352,7 @@ export function notebookGeneratorToolbar(
             ) as boolean;
             let showTags =
               _showTags != undefined ? _showTags : options.showTags;
-            this.allTags = null;
+            this.allTags = [];
             options.initializeOptions(
               numbering,
               showCode,
@@ -367,7 +368,7 @@ export function notebookGeneratorToolbar(
         });
       }
     }
-    public allTags: string[] | null;
+    public allTags: string[];
     toggleCode = (component: React.Component) => {
       options.showCode = !options.showCode;
       this.setState({ showCode: options.showCode });
@@ -404,14 +405,16 @@ export function notebookGeneratorToolbar(
       let notebook = tracker.currentWidget;
       if (notebook) {
         let cells = notebook.model.cells;
-        this.allTags = null;
+        this.allTags = [];
         for (var i = 0; i < cells.length; i++) {
-          let cellMetadata = cells.get(i).metadata;
-          let cellTagsData = cellMetadata.get('tags') as string[];
-          if (cellTagsData) {
-            for (var j = 0; j < cellTagsData.length; j++) {
-              let name = cellTagsData[j];
-              this.addTagIntoAllTagsList(name);
+          if (cells.get(i)) {
+            let cellMetadata = cells.get(i)!.metadata;
+            let cellTagsData = cellMetadata.get('tags') as string[];
+            if (cellTagsData) {
+              for (var j = 0; j < cellTagsData.length; j++) {
+                let name = cellTagsData[j];
+                this.addTagIntoAllTagsList(name);
+              }
             }
           }
         }
@@ -451,7 +454,6 @@ export function notebookGeneratorToolbar(
       //     type: TagTypeDropdownItem
       //   }
       // ];
-
       let codeIcon = this.state.showCode ? (
         <div
           className="toc-toolbar-code-button toc-toolbar-button"
@@ -540,7 +542,12 @@ export function notebookGeneratorToolbar(
       );
       if (this.state.showTags) {
         this.getTags();
-        tagDropdown = <div className={'tag-dropdown'}> </div>;
+        tagDropdown = (
+          <div className={'tag-dropdown'}>
+            {' '}
+            <TagsToolComponent allTagsList={this.allTags} />{' '}
+          </div>
+        );
         tagIcon = (
           <img
             alt="Hide Tag Dropdown"
