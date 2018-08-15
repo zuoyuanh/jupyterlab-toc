@@ -85,27 +85,21 @@ export class TagsToolComponent extends React.Component<any, any> {
         ? TagsToolStyleClasses.tagOperationsNoSelectedStyleClass
         : TagsToolStyleClasses.tagOperationsOptionStyleClass;
     return (
+      // <TagListComponent
+      //   widget={this.props.widget}
+      //   allTagsList={this.props.allTagsList}
+      //   selectionStateHandler={this.changeSelectionState}
+      //   selectedTag={this.state.selected}
+      // />
       <div>
-        <span>
-          <div className={TagsToolStyleClasses.tagHeaderStyleClass}>Tags</div>
-          <hr className={TagsToolStyleClasses.tagHeaderHrStyleClass} />
-        </span>
-        <TagListComponent
-          widget={this.props.widget}
-          allTagsList={this.props.allTagsList}
-          selectionStateHandler={this.changeSelectionState}
-          selectedTag={this.state.selected}
-        />
-        <div>
-          <div
-            className={operationClass}
-            onClick={event => {
-              event.stopPropagation();
-              this.clickedSelectAll();
-            }}
-          >
-            Select All Cells with this Tag
-          </div>
+        <div
+          className={operationClass}
+          onClick={event => {
+            event.stopPropagation();
+            this.clickedSelectAll();
+          }}
+        >
+          Select All Cells with this Tag
         </div>
       </div>
     );
