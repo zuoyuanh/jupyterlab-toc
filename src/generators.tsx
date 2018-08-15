@@ -612,7 +612,6 @@ export function createNotebookGenerator(
         let collapsed = cell!.model.metadata.get('toc-hr-collapsed') as boolean;
         collapsed = collapsed != undefined ? collapsed : false;
         let model = cell.model;
-        // Only parse markdown cells or code cell outputs
         if (model.type === 'code') {
           let executionCountNumber = (cell as CodeCell).model
             .executionCount as number;
@@ -620,8 +619,6 @@ export function createNotebookGenerator(
             executionCountNumber != null
               ? '[' + executionCountNumber + ']: '
               : '[ ]: ';
-          // Iterate over the outputs, and parse them if they
-          // are rendered markdown or HTML.
           let showCode = true;
           if (widget) {
             showCode = options.showCode;
@@ -631,6 +628,18 @@ export function createNotebookGenerator(
             const onClickFactory = (line: number) => {
               return () => {
                 cell.node.scrollIntoView();
+                for (
+                  let i = 0;
+                  i < tracker.currentWidget.model.cells.length;
+                  i++
+                ) {
+                  let currentCell = tracker.currentWidget.content.widgets[
+                    i
+                  ] as Cell;
+                  if (cell === currentCell) {
+                    tracker.currentWidget.content.activeCellIndex = i;
+                  }
+                }
               };
             };
             let lastLevel = Private.getLastLevel(headings);
@@ -663,6 +672,18 @@ export function createNotebookGenerator(
             const onClickFactory = (el: Element) => {
               return () => {
                 el.scrollIntoView();
+                for (
+                  let i = 0;
+                  i < tracker.currentWidget.model.cells.length;
+                  i++
+                ) {
+                  let currentCell = tracker.currentWidget.content.widgets[
+                    i
+                  ] as Cell;
+                  if (cell === currentCell) {
+                    tracker.currentWidget.content.activeCellIndex = i;
+                  }
+                }
               };
             };
             let lastLevel = Private.getLastLevel(headings);
@@ -718,6 +739,18 @@ export function createNotebookGenerator(
                 } else {
                   el.scrollIntoView();
                 }
+                for (
+                  let i = 0;
+                  i < tracker.currentWidget.model.cells.length;
+                  i++
+                ) {
+                  let currentCell = tracker.currentWidget.content.widgets[
+                    i
+                  ] as Cell;
+                  if (cell === currentCell) {
+                    tracker.currentWidget.content.activeCellIndex = i;
+                  }
+                }
               };
             };
             let numbering = options.numbering;
@@ -763,6 +796,18 @@ export function createNotebookGenerator(
                 cell.node.scrollIntoView();
                 if (!(cell as MarkdownCell).rendered) {
                   cell.editor.setCursorPosition({ line, column: 0 });
+                }
+                for (
+                  let i = 0;
+                  i < tracker.currentWidget.model.cells.length;
+                  i++
+                ) {
+                  let currentCell = tracker.currentWidget.content.widgets[
+                    i
+                  ] as Cell;
+                  if (cell === currentCell) {
+                    tracker.currentWidget.content.activeCellIndex = i;
+                  }
                 }
               };
             };
