@@ -1,9 +1,9 @@
 import { TagListComponent } from './tagslist';
 import * as React from 'react';
-import StyleClasses from './styles';
+//import StyleClasses from './styles';
 
 // const TAG_TOOL_CLASS = 'jp-cellTags-Tools';
-const TagsToolStyleClasses = StyleClasses.TagsToolStyleClasses;
+//const TagsToolStyleClasses = StyleClasses.TagsToolStyleClasses;
 
 export interface TagsToolComponentProps {
   // widget: TagsWidget;
@@ -54,6 +54,10 @@ export class TagsToolComponent extends React.Component<
     }
   };
 
+  deselectAllTags = () => {
+    this.setState({ selected: [] });
+  };
+
   handleClick = (e: any) => {
     if (this.node) {
       if (this.node.contains(e.target)) {
@@ -66,19 +70,15 @@ export class TagsToolComponent extends React.Component<
   render() {
     return (
       <div>
-        <span>
-          <div className={TagsToolStyleClasses.tagHeaderStyleClass}>Tags</div>
-          <hr className={TagsToolStyleClasses.tagHeaderHrStyleClass} />
-        </span>
         <TagListComponent
           allTagsList={this.props.allTagsList}
           selectionStateHandler={this.changeSelectionState}
           selectedTags={this.state.selected}
         />
+        <button onClick={() => this.deselectAllTags()}> Clear All </button>
       </div>
     );
   }
 
   private node: any;
 }
-

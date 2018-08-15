@@ -142,8 +142,8 @@ namespace Private {
   export function renderAllTagsNode() {
     ReactDOM.render(
       <TagsToolComponent
-        widget={widget}
-        tagsList={tagsList}
+        //widget={widget}
+        //tagsList={tagsList}
         allTagsList={allTagsList}
       />,
       widget.node
