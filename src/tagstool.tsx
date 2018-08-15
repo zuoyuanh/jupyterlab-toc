@@ -18,12 +18,6 @@ import StyleClasses from './styles';
 const TAG_TOOL_CLASS = 'jp-cellTags-Tools';
 const TagsToolStyleClasses = StyleClasses.TagsToolStyleClasses;
 
-export enum EditingStates {
-  none,
-  currentCell,
-  allCells
-}
-
 export interface TagsToolComponentProps {
   widget: TagsWidget;
   tagsList: string | null;
@@ -52,12 +46,28 @@ export class TagsToolComponent extends React.Component<any, any> {
   }
 
   clickedSelectAll = () => {
-    let selectedTag: string[] = [this.state.selected];
-    (this.props.widget as TagsWidget).selectAll(selectedTag);
+    let selectedTags: string[] = [this.state.selected];
+    (this.props.widget as TagsWidget).selectAll(selectedTags);
   };
 
-  changeSelectionState = (newState: string) => {
-    this.setState({ selected: newState });
+  changeSelectionState = (newState: string, add: boolean) => {
+    if (add) {
+      let selectedTags = this.state.selected;
+      selectedTags.push(newState);
+      this.setState({ selected: selectedTags });
+    } else {
+      let selectedTags = this.state.selected;
+      let newSelectedTags: string[] = [];
+      for (let i = 0; i < selectedTags.length; i++) {
+        if (selectedTags[i] !== newState) {
+          newSelectedTags.push(selectedTags[i]);
+        }
+      }
+      if (newSelectedTags.length === 0) {
+        newSelectedTags = null;
+      }
+      this.setState({ selected: newSelectedTags });
+    }
   };
 
   handleClick = (e: any) => {
@@ -71,7 +81,7 @@ export class TagsToolComponent extends React.Component<any, any> {
 
   render() {
     const operationClass =
-      this.state.selected === null || this.state.deletingTag === true
+      this.state.selected === null
         ? TagsToolStyleClasses.tagOperationsNoSelectedStyleClass
         : TagsToolStyleClasses.tagOperationsOptionStyleClass;
     return (
@@ -83,7 +93,6 @@ export class TagsToolComponent extends React.Component<any, any> {
         <TagListComponent
           widget={this.props.widget}
           allTagsList={this.props.allTagsList}
-          tagsList={this.props.tagsList}
           selectionStateHandler={this.changeSelectionState}
           selectedTag={this.state.selected}
         />
@@ -92,7 +101,6 @@ export class TagsToolComponent extends React.Component<any, any> {
             className={operationClass}
             onClick={event => {
               event.stopPropagation();
-              this.props.widget.tagBlurNotHandled = false;
               this.clickedSelectAll();
             }}
           >
