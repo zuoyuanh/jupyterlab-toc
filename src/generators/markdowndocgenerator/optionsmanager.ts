@@ -18,12 +18,21 @@ export class MarkdownDocGeneratorOptionsManager extends TableOfContentsRegistry.
     return this._numbering;
   }
 
+  set preRenderedToolbar(value: any) {
+    this._preRenderedToolbar = value;
+  }
+
+  get preRenderedToolbar() {
+    return this._preRenderedToolbar;
+  }
+
   // initialize options, will NOT change notebook metadata
   initializeOptions(numbering: boolean) {
     this._numbering = numbering;
     this._widget.update();
   }
 
+  private _preRenderedToolbar: any = null;
   private _numbering: boolean;
   private _widget: TableOfContents;
 }
