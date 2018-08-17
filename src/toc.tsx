@@ -327,10 +327,17 @@ export class TOCTree extends React.Component<ITOCTreeProps, ITOCTreeStates> {
     //   this.props.widget.filterByTag("test");
     // }
     // Return the JSX component.
+    let toolbarProps = {};
+    if (
+      this.props.widget.generator &&
+      this.props.widget.generator.toolbarProps
+    ) {
+      toolbarProps = this.props.widget.generator.toolbarProps;
+    }
     return (
       <div className="jp-TableOfContents">
         <header>{this.props.title}</header>
-        {Toolbar && <Toolbar />}
+        {Toolbar && <Toolbar {...toolbarProps} />}
         <ul className="jp-TableOfContents-content">{listing}</ul>
       </div>
     );

@@ -49,6 +49,9 @@ export function createNotebookGenerator(
     toolbarGenerator: () => {
       return notebookGeneratorToolbar(options, tracker);
     },
+    toolbarProps: {
+      options: options
+    },
     itemRenderer: (item: INotebookHeading) => {
       return notebookItemRenderer(options, item);
     },

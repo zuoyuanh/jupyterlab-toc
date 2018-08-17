@@ -99,6 +99,8 @@ export namespace TableOfContentsRegistry {
 
     toolbarGenerator?: () => any;
 
+    toolbarProps?: any;
+
     /**
      * A function that takes the widget, and produces
      * a list of headings.

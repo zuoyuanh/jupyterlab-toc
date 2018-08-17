@@ -106,6 +106,14 @@ export class NotebookGeneratorOptionsManager extends TableOfContentsRegistry.IGe
     return this._preRenderedToolbar;
   }
 
+  set notebookChanged(value: boolean) {
+    this._notebookChanged = value;
+  }
+
+  get notebookChanged() {
+    return this._notebookChanged;
+  }
+
   updateWidget() {
     this._widget.update();
   }
@@ -126,6 +134,7 @@ export class NotebookGeneratorOptionsManager extends TableOfContentsRegistry.IGe
 
   sanitizer: ISanitizer;
   private _preRenderedToolbar: any = null;
+  private _notebookChanged: boolean;
   private _filtered: string[] = [];
   private _numbering: boolean;
   private _showCode = false;
